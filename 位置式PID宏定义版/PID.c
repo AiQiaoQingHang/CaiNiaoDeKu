@@ -241,7 +241,7 @@ float PID_Compute(PID_Typedef *PID_struct, float Fb)
     /*--------------------------------------------- 输 出 限 幅 -----------------------------------------*/
     if (CO >= PID_struct->OUT_MAX) // 超过最大值
     {
-        if (Integral_increments < 0.0f) // 允许反向积分，积分增量小于0
+        if (cur_Err < 0.0f) // 允许反向积分，当前误差小于0
         {
             PID_struct->pre_I_Value = cur_integral; // 更新积分值
         }
@@ -253,7 +253,7 @@ float PID_Compute(PID_Typedef *PID_struct, float Fb)
     }
     else if (CO <= PID_struct->OUT_MIN) // 低于最小值
     {
-        if (Integral_increments > 0.0f) // 允许反向积分，积分增量大于0
+        if (cur_Err > 0.0f) // 允许反向积分，当前误差大于0
         {
             PID_struct->pre_I_Value = cur_integral; // 更新积分值
         }
