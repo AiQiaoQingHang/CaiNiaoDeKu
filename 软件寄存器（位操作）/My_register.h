@@ -1,13 +1,14 @@
 #ifndef MY_REGISTER
 #define MY_REGISTER
 
-/*Èí¼ş¼Ä´æÆ÷¡¾Î»²Ù×÷¡¿
- *Ê¹ÓÃÊ±ÓÃMy_8_Reg¶¨Òå¼Ä´æÆ÷£¬ÔÙÊ¹ÓÃÃ¶¾Ù¶¨Òå¼Ä´æÆ÷µÄÃ¿Ò»Î»£¬µ÷ÓÃº¯Êı²Ù¿Ø±êÖ¾Î»
+/*è½¯ä»¶å¯„å­˜å™¨ã€ä½æ“ä½œã€‘
+ *ä½¿ç”¨æ—¶ç”¨My_8_Regå®šä¹‰å¯„å­˜å™¨ï¼Œå†ä½¿ç”¨æšä¸¾å®šä¹‰å¯„å­˜å™¨çš„æ¯ä¸€ä½ï¼Œè°ƒç”¨å‡½æ•°æ“æ§æ ‡å¿—ä½
  *
  */
-#include "stm32f10x.h"                  // Device header
+#include "stdint.h"
 typedef uint8_t My_8_Reg;
 
-uint8_t My_Get_Flag(volatile My_8_Reg* Reg_name, uint8_t Flag_name);                                 //»ñÈ¡±êÖ¾Î»
-void My_Set_Flag(volatile My_8_Reg* Reg_name, uint8_t Flag_name, uint8_t Flag_status);               //¸ü¸Ä±êÖ¾Î»×´Ì¬
+uint8_t My_Get_Flag(volatile My_8_Reg* Reg_name, uint8_t Flag_name);                                 //è·å–æ ‡å¿—ä½
+void My_Set_Flag(volatile My_8_Reg* Reg_name, uint8_t Flag_name, uint8_t Flag_status);               //æ›´æ”¹æ ‡å¿—ä½çŠ¶æ€
 #endif
+
