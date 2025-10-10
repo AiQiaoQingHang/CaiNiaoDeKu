@@ -4,95 +4,96 @@
 #include <stdbool.h>
 #include "PID_Config.h"
 
-/*------------------------------ Åä ÖÃ ²Î Êı ºê ------------------------------*/
+/*------------------------------ é… ç½® å‚ æ•° å® ------------------------------*/
 #define PID_Set(PID_struct, Para, Value)                                \
         do                                                              \
         {                                                               \
             if((PID_struct) == (void*)0)  PID_Inval_Err_Proc();        \
-            PID_Config((PID_struct),(Para),(Value));                    \
+            else PID_Config((PID_struct),(Para),(Value));               \
         }while(0)
 
-/*------------------------------ Çı ¶¯ ½á ¹¹ Ìå ------------------------------*/
+/*------------------------------ é©± åŠ¨ ç»“ æ„ ä½“ ------------------------------*/
 typedef struct
 {
-    bool First_Run_Flag;      //Ê×´ÎÔËĞĞ±êÖ¾Î»
-    /*»ù±¾²ÎÊı*/
-    float Kp,Ki,Kd;           //±ÈÀıÏµÊı,»ı·ÖÏµÊı,Î¢·ÖÏµÊı
-    float Sp;                 //Éè¶¨ÖµorÆÚÍûÖµ
-    float dt;                 //ÖÜÆÚ
+    bool First_Run_Flag;      //é¦–æ¬¡è¿è¡Œæ ‡å¿—ä½
+    /*åŸºæœ¬å‚æ•°*/
+    float Kp,Ki,Kd;           //æ¯”ä¾‹ç³»æ•°,ç§¯åˆ†ç³»æ•°,å¾®åˆ†ç³»æ•°
+    float Sp;                 //è®¾å®šå€¼oræœŸæœ›å€¼
+    float dt;                 //å‘¨æœŸ
     
-    /*×´Ì¬±äÁ¿*/
-    float pre_Err;            //ÉÏÒ»´ÎPIDÎó²î
-    float pre_I_Value;        //ÉÏÒ»´Î»ı·ÖÖµ
-    float pre_Output;         //ÉÏÒ»´ÎÊä³öÖµ
+    /*çŠ¶æ€å˜é‡*/
+    float pre_Err;            //ä¸Šä¸€æ¬¡PIDè¯¯å·®
+    float pre_I_Value;        //ä¸Šä¸€æ¬¡ç§¯åˆ†å€¼
+    float pre_Output;         //ä¸Šä¸€æ¬¡è¾“å‡ºå€¼
     
-    /*»ı·Ö¿¹±¥ºÍ*/
-    float Weak_I_Rate;        //»ı·Ö±¥ºÍÊ±Í¬ÏòË¥¼õÏµÊı
+    /*ç§¯åˆ†æŠ—é¥±å’Œ*/
+    float Weak_I_Rate;        //ç§¯åˆ†é¥±å’Œæ—¶åŒå‘è¡°å‡ç³»æ•°
     
-    /*»ı·ÖËÀÇøÏà¹Ø*/
+    /*ç§¯åˆ†æ­»åŒºç›¸å…³*/
 #if I_Dead_Enable == PID_ENABLE
-    float I_Dead_Max;         //»ı·ÖËÀÇøÉÏÏŞ
-    float I_Dead_Min;         //»ı·ÖËÀÇøÏÂÏŞ
+    float I_Dead_Max;         //ç§¯åˆ†æ­»åŒºä¸Šé™
+    float I_Dead_Min;         //ç§¯åˆ†æ­»åŒºä¸‹é™
 #endif
 #if (I_Dead_Act == Decay_I) && (I_Dead_Enable == PID_ENABLE)
-    float I_Dead_DecayRate;   //»ı·ÖËÀÇøË¥¼õÏµÊı
+    float I_Dead_DecayRate;   //ç§¯åˆ†æ­»åŒºè¡°å‡ç³»æ•°
 #endif
-    /*Êä³öÏŞ·ùÏà¹Ø*/
-    float OUT_MAX;       //Î»ÖÃÊ½Êä³öÉÏÏŞ
-    float OUT_MIN;       //Î»ÖÃÊ½Êä³öÏÂÏŞ
+    /*è¾“å‡ºé™å¹…ç›¸å…³*/
+    float OUT_MAX;       //ä½ç½®å¼è¾“å‡ºä¸Šé™
+    float OUT_MIN;       //ä½ç½®å¼è¾“å‡ºä¸‹é™
     
-    /*Î¢·ÖÂË²¨Ïà¹Ø*/
+    /*å¾®åˆ†æ»¤æ³¢ç›¸å…³*/
 #if D_Filter_Enable == PID_ENABLE
-    float D_Filter_Rate;      //Î¢·ÖÂË²¨ÏµÊı
-    float pre_D_Value;        //ÉÏ´ÎÎ¢·ÖÖµ
+    float D_Filter_Rate;      //å¾®åˆ†æ»¤æ³¢ç³»æ•°
+    float pre_D_Value;        //ä¸Šæ¬¡å¾®åˆ†å€¼
 #endif
-    /*Î¢·ÖÏÈĞĞ*/
+    /*å¾®åˆ†å…ˆè¡Œ*/
 #if D_MODE_SELECT == D_MODE_FB
-    float pre_FB;             //ÉÏ´Î·´À¡Öµ
+    float pre_FB;             //ä¸Šæ¬¡åé¦ˆå€¼
 #endif
 } PID_Typedef;
 
-/*-------------------------- Ã¶ ¾Ù ÓÃ ÓÚ ²Î Êı ¼ì ²é -------------------------*/
+/*-------------------------- æš ä¸¾ ç”¨ äº å‚ æ•° æ£€ æŸ¥ -------------------------*/
 typedef enum
 {
-    /*»ù±¾²ÎÊı*/
+    /*åŸºæœ¬å‚æ•°*/
     PID_PARA_Kp = 0,
     PID_PARA_Ki,
     PID_PARA_Kd,
     PID_PARA_Sp,
     PID_PARA_dt,
-    /*»ı·Ö¿¹±¥ºÍ*/
-    PID_PARA_Weak_I_Rate,        //»ı·Ö±¥ºÍÊ±Í¬ÏòË¥¼õÏµÊı
-    /*»ı·ÖËÀÇøÏà¹Ø*/
+    /*ç§¯åˆ†æŠ—é¥±å’Œ*/
+    PID_PARA_Weak_I_Rate,        //ç§¯åˆ†é¥±å’Œæ—¶åŒå‘è¡°å‡ç³»æ•°
+    /*ç§¯åˆ†æ­»åŒºç›¸å…³*/
 #if I_Dead_Enable == PID_ENABLE
-    PID_PARA_I_Dead_Max,         //»ı·ÖËÀÇøÉÏÏŞ
-    PID_PARA_I_Dead_Min,         //»ı·ÖËÀÇøÏÂÏŞ
+    PID_PARA_I_Dead_Max,         //ç§¯åˆ†æ­»åŒºä¸Šé™
+    PID_PARA_I_Dead_Min,         //ç§¯åˆ†æ­»åŒºä¸‹é™
     #if I_Dead_Act == Decay_I
-    PID_PARA_I_Dead_DecayRate,   //»ı·ÖËÀÇøË¥¼õÏµÊı
+    PID_PARA_I_Dead_DecayRate,   //ç§¯åˆ†æ­»åŒºè¡°å‡ç³»æ•°
     #endif
 #endif
-    /*Êä³öÏŞ·ùÏà¹Ø*/
-    PID_PARA_OUT_MAX,       //Î»ÖÃÊ½Êä³öÉÏÏŞ
-    PID_PARA_OUT_MIN,       //Î»ÖÃÊ½Êä³öÏÂÏŞ
+    /*è¾“å‡ºé™å¹…ç›¸å…³*/
+    PID_PARA_OUT_MAX,       //ä½ç½®å¼è¾“å‡ºä¸Šé™
+    PID_PARA_OUT_MIN,       //ä½ç½®å¼è¾“å‡ºä¸‹é™
 #if PID_MODE == PID_MODE_INCR
-    PID_PARA_OUT_MAX_INCR,       //ÔöÁ¿Ê½Êä³öÉÏÏŞ
-    PID_PARA_OUT_MIN_INCR,       //ÔöÁ¿Ê½Êä³öÏÂÏŞ
+    PID_PARA_OUT_MAX_INCR,       //å¢é‡å¼è¾“å‡ºä¸Šé™
+    PID_PARA_OUT_MIN_INCR,       //å¢é‡å¼è¾“å‡ºä¸‹é™
 #endif
-    /*Î¢·ÖÂË²¨Ïà¹Ø*/
+    /*å¾®åˆ†æ»¤æ³¢ç›¸å…³*/
 #if D_Filter_Enable == PID_ENABLE
-    PID_PARA_D_Filter_Rate,      //Î¢·ÖÂË²¨ÏµÊı
+    PID_PARA_D_Filter_Rate,      //å¾®åˆ†æ»¤æ³¢ç³»æ•°
 #endif
 }PID_t;
 
-/*---------------------------- P I D Ïà ¹Ø º¯ Êı --------------------------*/
-/*´íÎó´¦Àí*/
+/*---------------------------- P I D ç›¸ å…³ å‡½ æ•° --------------------------*/
+/*é”™è¯¯å¤„ç†*/
 void PID_Inval_Err_Proc(void);
-/*ÅäÖÃº¯Êı*/
-void PID_Config(PID_Typedef *PID_struct,PID_t PID_PARA_X,float Value);               //ÅäÖÃPID²ÎÊı
-/*³õÊ¼»¯º¯Êı*/
+/*é…ç½®å‡½æ•°*/
+void PID_Config(PID_Typedef *PID_struct,PID_t PID_PARA_X,float Value);               //é…ç½®PIDå‚æ•°
+/*åˆå§‹åŒ–å‡½æ•°*/
 void PID_Init(PID_Typedef *PID_struct,float Kp,float Ki,float Kd,float Sp,
-                                       float dt,float OUT_MAX,float OUT_MIN);        //PID²ÎÊı³õÊ¼»¯
-/*PIDÔËËã*/
-float PID_Compute(PID_Typedef *PID_struct,float Fb);                                 //½øĞĞÒ»´ÎPIDÔËËã
+                                       float dt,float OUT_MAX,float OUT_MIN);        //PIDå‚æ•°åˆå§‹åŒ–
+/*PIDè¿ç®—*/
+float PID_Compute(PID_Typedef *PID_struct,float Fb);                                 //è¿›è¡Œä¸€æ¬¡PIDè¿ç®—
 
 #endif
+
