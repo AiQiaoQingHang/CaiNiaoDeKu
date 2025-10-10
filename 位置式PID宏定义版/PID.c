@@ -141,8 +141,8 @@ float PID_Compute(PID_Typedef *PID_struct, float Fb)
     float cur_Err = PID_struct->Sp - Fb; // 设定值 - 反馈值
 
     /*----------------------------------------- 计 算 积 分 项 I ----------------------------------------------*/
-    float Integral_increments = 0; // 梯形面积，积分增量
-    float cur_integral = 0;        // 积分值
+    float Integral_increments = 0.0f; // 梯形面积，积分增量
+    float cur_integral = 0.0f;        // 积分值
     /*-------------------------- 计 算 积 分 增 量 ------------------------------*/
     if ((PID_struct->Ki != 0.0f) && (PID_struct->Ki > 1e-6f))
     {
@@ -159,10 +159,10 @@ float PID_Compute(PID_Typedef *PID_struct, float Fb)
         if (cur_Err >= PID_struct->I_Dead_Min && cur_Err <= PID_struct->I_Dead_Max) // 在死区内
         {
 #if I_Dead_Act == Clear_I    // 积分死区内清零积分项
-            PID_struct->pre_I_Value = 0;
-            Integral_increments = 0;
+            PID_struct->pre_I_Value = 0.0f;
+            Integral_increments = 0.0f;
 #elif I_Dead_Act == Frozen_I // 积分死区内冻结
-            Integral_increments = 0; // 积分增量为 0，保持上一次积分值
+            Integral_increments = 0.0f; // 积分增量为 0，保持上一次积分值
 #elif I_Dead_Act == Decay_I  // 积分死区内衰减
             Integral_increments = ((PID_struct->pre_Err + cur_Err) / 2.0f) * PID_struct->dt * PID_struct->I_Dead_DecayRate; // 多乘一个衰减系数
 #else                        // I_Dead_Act错误参数，正常积分
@@ -198,7 +198,7 @@ float PID_Compute(PID_Typedef *PID_struct, float Fb)
     }
 
     /*------------------------------------------ 计 算 微 分 项 D --------------------------------------*/
-    float cur_differ = 0;
+    float cur_differ = 0.0f;
     if ((PID_struct->Kd != 0.0f) && (PID_struct->Kd > 1e-6f))
     {
         if (PID_struct->First_Run_Flag == true) // 第一次运行
