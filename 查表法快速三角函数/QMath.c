@@ -1,5 +1,5 @@
 #include "QMath.h"
-#include "stdint.h"
+#include <stdint.h>
 #include <math.h>
 
 /*
@@ -211,4 +211,5 @@ float atan2_fast(float y,float x)
         else return 0.0f; // 未定义，通常返回0
     }
 }
+
 
