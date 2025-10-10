@@ -5,10 +5,11 @@
  *使用时用My_8_Reg定义寄存器，再使用枚举定义寄存器的每一位，调用函数操控标志位
  *
  */
-#include "stdint.h"
+#include <stdint.h>
 typedef uint8_t My_8_Reg;
 
 uint8_t My_Get_Flag(volatile My_8_Reg* Reg_name, uint8_t Flag_name);                                 //获取标志位
 void My_Set_Flag(volatile My_8_Reg* Reg_name, uint8_t Flag_name, uint8_t Flag_status);               //更改标志位状态
 #endif
+
 
