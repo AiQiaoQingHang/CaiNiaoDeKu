@@ -15,9 +15,7 @@ uint8_t PRINTF_VOID_ERR = 0; // 打印函数空指针标志位
  *********************************************************************/
 __weak void NRF24L01_ASSERT_Failed(void)
 {
-    while(1)
-    {
-
+    while (1) {
     };
 }
 #endif
@@ -331,6 +329,8 @@ void NRF24L01_EnterTx(NRF24L01_Driver_t *drv)
     config_reg |= PWR_UP; // x x x x		x x 1 0，PRIM_RX在上面已经是0
     /*写回寄存器*/
     NRF24L01_W_Reg(drv, NRF24L01_CONFIG, config_reg);
+    /* 切换模式需要至少130us延迟 */
+    drv->Delay_us(200);
     /*更新结构体，并检查同步*/
     __NRF24L01_SYNC_Struct(drv, NRF24L01_CONFIG, config_reg);
 }
@@ -356,6 +356,8 @@ void NRF24L01_EnterRx(NRF24L01_Driver_t *drv)
     config_reg |= (PWR_UP | PRIM_RX); // x x x x		x x 1 1
     /*写回寄存器*/
     NRF24L01_W_Reg(drv, NRF24L01_CONFIG, config_reg);
+    /* 切换模式需要至少130us延迟 */
+    drv->Delay_us(200);
     /*更新结构体，并检查同步*/
     __NRF24L01_SYNC_Struct(drv, NRF24L01_CONFIG, config_reg);
     /*拉高CE，持续监听*/
@@ -381,6 +383,8 @@ void NRF24L01_EnterStandby_1(NRF24L01_Driver_t *drv)
     config_reg |= PWR_UP;
     /*写回寄存器*/
     NRF24L01_W_Reg(drv, NRF24L01_CONFIG, config_reg);
+    /* 切换模式需要至少130us延迟 */
+    drv->Delay_us(200);
     /*更新结构体，并检查同步*/
     __NRF24L01_SYNC_Struct(drv, NRF24L01_CONFIG, config_reg);
 }
@@ -404,6 +408,8 @@ void NRF24L01_EnterPowerDown(NRF24L01_Driver_t *drv)
     config_reg &= ~(PWR_UP); // x x x x		x x 0 x
     /*写回寄存器*/
     NRF24L01_W_Reg(drv, NRF24L01_CONFIG, config_reg);
+    /* 切换模式需要至少130us延迟 */
+    drv->Delay_us(200);
     /*更新结构体，并检查同步*/
     __NRF24L01_SYNC_Struct(drv, NRF24L01_CONFIG, config_reg);
 }
