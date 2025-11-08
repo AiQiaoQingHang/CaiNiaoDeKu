@@ -165,7 +165,7 @@ void NRF24L01_EnterStandby_1(NRF24L01_Driver_t *drv);                           
 void NRF24L01_ClearFIFOTx(NRF24L01_Driver_t *drv);                                                          // 清空FIFOTx
 void NRF24L01_ClearFIFORx(NRF24L01_Driver_t *drv);                                                          // 清空FIFORx
 void NRF24L01_R_RxFIFO(NRF24L01_Driver_t *drv, NRF24L01_Pack_t *Rece);                                      // 读Rx_FIFO【静态载荷】【动态载荷】
-void NRF24L01_W_Tx(NRF24L01_Driver_t *drv, W_TX_Command W_TX, uint8_t *Send, uint8_t size, uint8_t Pipe_X); // 写Tx_FIFO
+void NRF24L01_W_TxFIFO(NRF24L01_Driver_t *drv, W_TX_Command W_TX, uint8_t *Send, uint8_t size, uint8_t Pipe_X); // 写Tx_FIFO
 void NRF24L01_SendData(NRF24L01_Driver_t *drv);                                                             // 发送数据
 NRF24L01_FLAG_Status NRF24L01_GetITFLAG(NRF24L01_Driver_t *drv, Reg_STATUS IT_FLAG);                        // 获取中断标志位
 void NRF24L01_ClearITFLAG(NRF24L01_Driver_t *drv, Reg_STATUS IT_FLAG);                                      // 清除中断标志位
@@ -175,7 +175,7 @@ uint8_t NRF24L01_GetDataPipe(NRF24L01_Driver_t *drv);                           
 void NRF24L01_EN_AutoACK(NRF24L01_Driver_t *drv, Reg_EN_AA EN_AA, NRF24L01_Status new_status);                // 使能自动应答
 void NRF24L01_EN_RxAddr(NRF24L01_Driver_t *drv, Reg_EN_RXADDR ERX, NRF24L01_Status new_status);               // 使能接收通道
 void NRF24L01_Set_Addr_Width(NRF24L01_Driver_t *drv, Reg_SETUP_AW Address_Width);                             // 设置地址长度
-void NRF24L01_SET_RETR(NRF24L01_Driver_t *drv, Reg_SETUP_RETR_ARD ARD, Reg_SETUP_RETR_ARC ARC);               // 设置自动重传延时，自动重传次数
+void NRF24L01_Set_RETR(NRF24L01_Driver_t *drv, Reg_SETUP_RETR_ARD ARD, Reg_SETUP_RETR_ARC ARC);               // 设置自动重传延时，自动重传次数
 void NRF24L01_SetAir_Data_Rate(NRF24L01_Driver_t *drv, Reg_RF_SETUP RF_DR);                                   // 设置空中数据速率
 void NRF24L01_PA_Control(NRF24L01_Driver_t *drv, Reg_RF_SETUP RF_PWR);                                        // 设置射频输出功率
 void NRF24L01_SetFrequencyMHz(NRF24L01_Driver_t *drv, uint16_t freqMHz);                                      // 设置2.4g通信频段
