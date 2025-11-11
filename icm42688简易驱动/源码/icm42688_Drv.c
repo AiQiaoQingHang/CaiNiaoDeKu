@@ -145,7 +145,7 @@ bool icm42688_UpTEMP(ICM42688_Driver_t *Driver)
     }
     /* 切换字节序 */
     BYTESWAP_ARRAY_16BIT(TEMP_Data, ICM_TEMP_DATA_SIZE_16BIT);
-    memcpy((uint8_t *)&Driver->ICM_Value.icm_Data_Buf[ICM_TEMP_DATA_OFFSET_8BIT], (uint8_t *)&TEMP_Data, sizeof(TEMP_Data));
+    memcpy((uint8_t *)&Driver->ICM_Data_Buf[ICM_TEMP_DATA_OFFSET_8BIT], (uint8_t *)&TEMP_Data, sizeof(TEMP_Data));
     return true;
 }
 
@@ -179,7 +179,7 @@ bool icm42688_UpACCEL(ICM42688_Driver_t *Driver, bool Fil_EN)
         }
     }
     /* 将滤波后的值存入缓存区，使用memcpy防止对齐问题 */
-    memcpy((uint8_t *)&Driver->ICM_Value.icm_Data_Buf[ICM_ACCEL_DATA_OFFSET_8BIT], (uint8_t *)ACCEL_Data, sizeof(ACCEL_Data));
+    memcpy((uint8_t *)&Driver->ICM_Data_Buf[ICM_ACCEL_DATA_OFFSET_8BIT], (uint8_t *)ACCEL_Data, sizeof(ACCEL_Data));
     return true;
 }
 
@@ -214,7 +214,7 @@ bool icm42688_UpGYRO(ICM42688_Driver_t *Driver, bool Fil_EN)
         }
     }
     /* 将滤波后的值存入缓存区，使用memcpy防止对齐问题 */
-    memcpy((uint8_t *)&Driver->ICM_Value.icm_Data_Buf[ICM_GYRO_DATA_OFFSET_8BIT], (uint8_t *)GYRO_Data, sizeof(GYRO_Data));
+    memcpy((uint8_t *)&Driver->ICM_Data_Buf[ICM_GYRO_DATA_OFFSET_8BIT], (uint8_t *)GYRO_Data, sizeof(GYRO_Data));
     return true;
 }
 
@@ -228,37 +228,36 @@ bool icm42688_UpGYRO(ICM42688_Driver_t *Driver, bool Fil_EN)
  */
 bool icm42688_UpAllData(ICM42688_Driver_t *Driver, bool Fil_EN)
 {
-    int16_t Data_Buf[ICM_ALL_DATA_SIZE_16BIT] = {0}; // 数据缓存区
+    int16_t* Data_Buf_Ptr = (int16_t*)Driver->ICM_Data_Buf; // 16位指针
     /* 从温度计起始地址连续读14字节，读出全部数据 */
-    if (!icm42688_R_Regs(Driver, icm42688_TEMP_OUT_H, (uint8_t *)Data_Buf, ICM_ALL_DATA_SIZE_8BIT))
+    if (!icm42688_R_Regs(Driver, icm42688_TEMP_OUT_H, (uint8_t *)Driver->ICM_Data_Buf, ICM_ALL_DATA_SIZE_8BIT))
     {
         return false;
     }
     /* 切换字节序 */
-    BYTESWAP_ARRAY_16BIT(Data_Buf, ICM_ALL_DATA_SIZE_16BIT);
+    BYTESWAP_ARRAY_16BIT(Data_Buf_Ptr, ICM_ALL_DATA_SIZE_16BIT);
     if (Fil_EN)
     {
         /* 【 0 温度】【 1 ~ 3 加速度计】【 4 ~ 6 陀螺仪】*/
         /* 加速度计滤波 */
-        icm42688_ACCEL_Fil(Driver, &Data_Buf[ICM_ACCEL_DATA_OFFSET_16BIT]);
+        icm42688_ACCEL_Fil(Driver, &Data_Buf_Ptr[ICM_ACCEL_DATA_OFFSET_16BIT]);
         /* 陀螺仪滤波 */
-        icm42688_GYRO_Fil(Driver, &Data_Buf[ICM_GYRO_DATA_OFFSET_16BIT]);
+        icm42688_GYRO_Fil(Driver, &Data_Buf_Ptr[ICM_GYRO_DATA_OFFSET_16BIT]);
     }
     else
     {
         /* 加速度计保存值*/
         for (uint8_t i = 0; i < ICM_ACCEL_DATA_SIZE_16BIT; i++)
         {
-            Driver->ICM_Value.Pre_ACCEL[i] = Data_Buf[i + ICM_ACCEL_DATA_OFFSET_16BIT]; // 保存本次滤波后的值
+            Driver->ICM_Value.Pre_ACCEL[i] = Data_Buf_Ptr[i + ICM_ACCEL_DATA_OFFSET_16BIT]; // 保存本次滤波后的值
         }
         /* 陀螺仪保存值*/
         for (uint8_t i = 0; i < ICM_GYRO_DATA_SIZE_16BIT; i++)
         {
-            Data_Buf[i + ICM_GYRO_DATA_OFFSET_16BIT] -= Driver->ICM_Value.GYRO_Bias[i]; // 减去零偏
-            Driver->ICM_Value.Pre_GYRO[i] = Data_Buf[i + ICM_GYRO_DATA_OFFSET_16BIT];   // 保存去除零偏后的值
+            Data_Buf_Ptr[i + ICM_GYRO_DATA_OFFSET_16BIT] -= Driver->ICM_Value.GYRO_Bias[i]; // 减去零偏
+            Driver->ICM_Value.Pre_GYRO[i] = Data_Buf_Ptr[i + ICM_GYRO_DATA_OFFSET_16BIT];   // 保存去除零偏后的值
         }
     }
-    memcpy((uint8_t *)&Driver->ICM_Value.icm_Data_Buf[0], (uint8_t *)Data_Buf, sizeof(Data_Buf));
     return true;
 }
 
@@ -269,8 +268,8 @@ bool icm42688_UpAllData(ICM42688_Driver_t *Driver, bool Fil_EN)
  */
 void icm42688_ACCEL_GYRO_Fil(ICM42688_Driver_t *Driver)
 {
-    icm42688_ACCEL_Fil(Driver, (int16_t *)&Driver->ICM_Value.icm_Data_Buf[ICM_ACCEL_DATA_OFFSET_8BIT]);
-    icm42688_GYRO_Fil(Driver, (int16_t *)&Driver->ICM_Value.icm_Data_Buf[ICM_GYRO_DATA_OFFSET_8BIT]);
+    icm42688_ACCEL_Fil(Driver, (int16_t *)&Driver->ICM_Data_Buf[ICM_ACCEL_DATA_OFFSET_8BIT]);
+    icm42688_GYRO_Fil(Driver, (int16_t *)&Driver->ICM_Data_Buf[ICM_GYRO_DATA_OFFSET_8BIT]);
 }
 
 /**
@@ -317,7 +316,7 @@ uint16_t icm42688_Cal(ICM42688_Driver_t *Driver, uint16_t num_samples, uint16_t 
         /* 更新数据 */
         if (icm42688_UpGYRO(Driver, false)) // 陀螺仪数据更新
         {
-            memcpy((uint8_t *)GYRO_Buf, (uint8_t *)&Driver->ICM_Value.icm_Data_Buf[8], sizeof(GYRO_Buf));
+            memcpy((uint8_t *)GYRO_Buf, (uint8_t *)&Driver->ICM_Data_Buf[8], sizeof(GYRO_Buf));
             /*求和*/
             Sum_GYRO_Bias[0] += GYRO_Buf[0]; // 【X】
             Sum_GYRO_Bias[1] += GYRO_Buf[1]; // 【Y】
@@ -343,8 +342,8 @@ void icm42688_Slove_Eular(ICM42688_Driver_t *Driver)
     int16_t ACCEL_Buf[3] = {0};
     int16_t GYRO_Buf[3] = {0};
     /* 从缓存区获取数据 */
-    memcpy((uint8_t *)ACCEL_Buf, (uint8_t *)&Driver->ICM_Value.icm_Data_Buf[ICM_ACCEL_DATA_OFFSET_8BIT], sizeof(ACCEL_Buf));
-    memcpy((uint8_t *)GYRO_Buf, (uint8_t *)&Driver->ICM_Value.icm_Data_Buf[ICM_GYRO_DATA_OFFSET_8BIT], sizeof(GYRO_Buf));
+    memcpy((uint8_t *)ACCEL_Buf, (uint8_t *)&Driver->ICM_Data_Buf[ICM_ACCEL_DATA_OFFSET_8BIT], sizeof(ACCEL_Buf));
+    memcpy((uint8_t *)GYRO_Buf, (uint8_t *)&Driver->ICM_Data_Buf[ICM_GYRO_DATA_OFFSET_8BIT], sizeof(GYRO_Buf));
     /*计算【陀螺仪】欧拉角，【Y】轴正方向为前进*/
     float G_Roll = Driver->ICM_Value.Roll + GYRO_Buf[1] * Driver->ICM_Para.Ts;   // 陀螺仪翻滚角	Y
     float G_Pitch = Driver->ICM_Value.Pitch + GYRO_Buf[0] * Driver->ICM_Para.Ts; // 陀螺仪俯仰角	X
