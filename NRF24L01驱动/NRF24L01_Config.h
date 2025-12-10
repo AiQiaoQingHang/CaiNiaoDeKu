@@ -1,7 +1,7 @@
 #ifndef NRF24L01_CONFIG_H
 #define NRF24L01_CONFIG_H
 
-#define Debug_Enable 1 // Debug模式开关
+#define Debug_Enable 0 // Debug模式开关
 #define Status_SYNC  1 // 状态同步开关
 #if Status_SYNC
 /*选择需要同步的寄存器*/

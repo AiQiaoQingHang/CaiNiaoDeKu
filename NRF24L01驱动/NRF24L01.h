@@ -1,29 +1,34 @@
 #ifndef NRF24L01_H
 #define NRF24L01_H
 #include <stdint.h>
-#include "NRF24L01_define.h" //ÒıÓÃNRF24L01¼Ä´æÆ÷Ó³ÉäÓëÖ¸Áîºê¶¨Òå
+#include <stdbool.h>
+#include "NRF24L01_define.h" //å¼•ç”¨NRF24L01å¯„å­˜å™¨æ˜ å°„ä¸æŒ‡ä»¤å®å®šä¹‰
 #include "NRF24L01_Config.h"
-/*--------------------------------- µ÷ ÊÔ Ïà ¹Ø -----------------------------------*/
-// ÕâÒ»¿éÖ÷ÒªÊÇµ÷ÊÔÊ±¼ì²éNRF24L01_Driver_tÕâ¸öÀàĞÍ´«Èëº¯ÊıÊ±ÊÇ·ñÎª¿ÕÖ¸Õë
+/*--------------------------------- è°ƒ è¯• ç›¸ å…³ -----------------------------------*/
+// è¿™ä¸€å—ä¸»è¦æ˜¯è°ƒè¯•æ—¶æ£€æŸ¥NRF24L01_Driver_tè¿™ä¸ªç±»å‹ä¼ å…¥å‡½æ•°æ—¶æ˜¯å¦ä¸ºç©ºæŒ‡é’ˆ
 
 #if Debug_Enable
-extern uint8_t DRIVER_VOID_ERR;    // NRF24L01_Driver_t¿ÕÖ¸Õë±êÖ¾Î»
-extern uint8_t PRINTF_VOID_ERR;    // ´òÓ¡º¯Êı¿ÕÖ¸Õë±êÖ¾Î»
-void NRF24L01_ASSERT_Failed(void); // Õâ¸öº¯ÊıĞèÒª×Ô¼ºÌí¼ÓÄÚÈİ
+extern uint8_t DRIVER_VOID_ERR;    // NRF24L01_Driver_tç©ºæŒ‡é’ˆæ ‡å¿—ä½
+extern uint8_t PRINTF_VOID_ERR;    // æ‰“å°å‡½æ•°ç©ºæŒ‡é’ˆæ ‡å¿—ä½
+void NRF24L01_ASSERT_Failed(void); // è¿™ä¸ªå‡½æ•°éœ€è¦è‡ªå·±æ·»åŠ å†…å®¹
 #define NRF24L01_ASSERT(drv)          \
-    do {                              \
-        if (!(drv)) {                 \
+    do                                \
+    {                                 \
+        if (!(drv))                   \
+        {                             \
             DRIVER_VOID_ERR = 1;      \
             NRF24L01_ASSERT_Failed(); \
         }                             \
     } while (0)
 
-// ÓÃÓÚ´òÓ¡´íÎóĞÅÏ¢£¬¶àĞ¾Æ¬¹ÒÔØÊ±¿ÉÒÔÔÚdrvÀïµÄprintfº¯ÊıÖĞ¼ÓÈëÒ»Ğ©±êÊ¶£¬·½±ã²é¿´ÊÇÄÄ¸öĞ¾Æ¬³öÎÊÌâ
+// ç”¨äºæ‰“å°é”™è¯¯ä¿¡æ¯ï¼Œå¤šèŠ¯ç‰‡æŒ‚è½½æ—¶å¯ä»¥åœ¨drvé‡Œçš„printfå‡½æ•°ä¸­åŠ å…¥ä¸€äº›æ ‡è¯†ï¼Œæ–¹ä¾¿æŸ¥çœ‹æ˜¯å“ªä¸ªèŠ¯ç‰‡å‡ºé—®é¢˜
 #define NRF24L01_ERR_PRINT(drv, str)   \
-    do {                               \
+    do                                 \
+    {                                  \
         if (!(drv))                    \
             DRIVER_VOID_ERR = 1;       \
-        else {                         \
+        else                           \
+        {                              \
             if (!((drv)->My_Printf))   \
                 PRINTF_VOID_ERR = 1;   \
             else                       \
@@ -31,27 +36,32 @@ void NRF24L01_ASSERT_Failed(void); // Õâ¸öº¯ÊıĞèÒª×Ô¼ºÌí¼ÓÄÚÈİ
         }                              \
     } while (0)
 
-/*ÅäÖÃ´íÎó´¦Àíºê*/
+/*é…ç½®é”™è¯¯å¤„ç†å®*/
 #define NRF24L01_Config_Err_Proc(drv, Err_Flag, str)                          \
-    do {                                                                      \
+    do                                                                        \
+    {                                                                         \
         (drv)->Config_Err_FLAG = Err_Flag;                                    \
-        if ((drv)->My_Printf != (void *)0) {                                  \
+        if ((drv)->My_Printf != (void *)0)                                    \
+        {                                                                     \
             NRF24L01_ERR_PRINT((drv), str);                                   \
-            if ((drv)->Config_Err_CallBack != (void *)0) {                    \
+            if ((drv)->Config_Err_CallBack != (void *)0)                      \
+            {                                                                 \
                 (drv)->Config_Err_CallBack(drv);                              \
-            } else                                                            \
+            }                                                                 \
+            else                                                              \
                 NRF24L01_ERR_PRINT((drv), "Config_Err_CallBack is NULL\r\n"); \
         }                                                                     \
     } while (0)
 #else
-#define NRF24L01_ASSERT(drv)                         ((void)0)
-#define NRF24L01_ERR_PRINT(drv, str)                 ((void)0)
+#define NRF24L01_ASSERT(drv) ((void)0)
+#define NRF24L01_ERR_PRINT(drv, str) ((void)0)
 #define NRF24L01_Config_Err_Proc(drv, Err_Flag, str) ((void)0)
 #endif
-/*---------------------------------- ½á ¹¹ Ìå Í¬ ²½ ---------------------------------*/
+/*---------------------------------- ç»“ æ„ ä½“ åŒ æ­¥ ---------------------------------*/
 #if Status_SYNC
 #define __NRF24L01_SYNC_Struct(drv, Reg_Addr, Reg_Value)        \
-    do {                                                        \
+    do                                                          \
+    {                                                           \
         NRF24L01_SyncStruct_Single((drv), Reg_Addr, Reg_Value); \
         NRF24L01_SyncCheck((drv), Reg_Addr);                    \
     } while (0)
@@ -59,132 +69,137 @@ void NRF24L01_ASSERT_Failed(void); // Õâ¸öº¯ÊıĞèÒª×Ô¼ºÌí¼ÓÄÚÈİ
 #define __NRF24L01_SYNC_Struct(drv, Reg_Addr, Reg_Value) ((void)0)
 #endif
 
-/*---------------------------------- ½á ¹¹ Ìå ¶¨ Òå ---------------------------------*/
-/*NRF¿ØÖÆ¿é¶¨Òå*/
-/*NRF¿ØÖÆ¿é´´½¨ºê*/
-/*ÓÃÕâ¸öºê¶¨Òå´´½¨±äÁ¿£¬ĞèÊÖ¶¯µ÷ÓÃ×´Ì¬Í¬²½º¯Êı*/
+/*---------------------------------- ç»“ æ„ ä½“ å®š ä¹‰ ---------------------------------*/
+/*NRFæ§åˆ¶å—å®šä¹‰*/
+/*NRFæ§åˆ¶å—åˆ›å»ºå®*/
+/*ç”¨è¿™ä¸ªå®å®šä¹‰åˆ›å»ºå˜é‡ï¼Œéœ€æ‰‹åŠ¨è°ƒç”¨çŠ¶æ€åŒæ­¥å‡½æ•°*/
 #define NRF24L01_Creat_CtrlBlock(Name, Delay_func, Spi_func, W_CE_func, W_CS_func) \
     NRF24L01_Driver_t Name = {                                                     \
-        .Delay_us           = Delay_func,                                          \
+        .Delay_us = Delay_func,                                                    \
         .SPI_SwapByte_MODE0 = Spi_func,                                            \
-        .NRF24L01_W_CE      = W_CE_func,                                           \
-        .NRF24L01_W_CS      = W_CS_func,                                           \
-        .MAX_RT_CallBack    = ((void *)0),                                         \
-        .TX_DS_CallBack     = ((void *)0),                                         \
-        .RX_DR_CallBack     = ((void *)0),                                         \
+        .NRF24L01_W_CE = W_CE_func,                                                \
+        .NRF24L01_W_CS = W_CS_func,                                                \
+        .MAX_RT_CallBack = ((void *)0),                                            \
+        .TX_DS_CallBack = ((void *)0),                                             \
+        .RX_DR_CallBack = ((void *)0),                                             \
     }
 
-/*½ÓÊÕÊı½á¹¹Ìå*/
-typedef struct {
-    uint8_t Data[32]; // »º´æ
-    uint8_t pipe;     // ¹ÜµÀºÅ
+/*æ¥æ”¶æ•°ç»“æ„ä½“*/
+typedef struct
+{
+    uint8_t Data[32]; // ç¼“å­˜
+    uint8_t pipe;     // ç®¡é“å·
 } NRF24L01_Pack_t;
 
 #if Status_SYNC
-/*Ğ¾Æ¬×´Ì¬½á¹¹Ìå*/
-typedef struct {
+/*èŠ¯ç‰‡çŠ¶æ€ç»“æ„ä½“*/
+typedef struct
+{
 #if SYNC_INCLUDE_CONFIG_Reg
-    uint8_t Cur_Mode;       // µ±Ç°Ä£Ê½
-    uint8_t Cur_CRC_Length; // µ±Ç°CRC³¤¶È
+    uint8_t Cur_Mode;       // å½“å‰æ¨¡å¼
+    uint8_t Cur_CRC_Length; // å½“å‰CRCé•¿åº¦
 #endif
 #if SYNC_INCLUDE_EN_AA_Reg
-    uint8_t EN_Pipe_AA; // Í¨µÀ×Ô¶¯Ó¦´ğÊ¹ÄÜ     ÄÄÒ»Î»Îª 1 ´ú±íÆôÓÃ
+    uint8_t EN_Pipe_AA; // é€šé“è‡ªåŠ¨åº”ç­”ä½¿èƒ½     å“ªä¸€ä½ä¸º 1 ä»£è¡¨å¯ç”¨
 #endif
 #if SYNC_INCLUDE_EN_RXADDR_Reg
-    uint8_t EN_Pipe_RX; // ½ÓÊÕÍ¨µÀµØÖ·ÆôÓÃ     ÄÄÒ»Î»Îª 1 ´ú±íÆôÓÃ
+    uint8_t EN_Pipe_RX; // æ¥æ”¶é€šé“åœ°å€å¯ç”¨     å“ªä¸€ä½ä¸º 1 ä»£è¡¨å¯ç”¨
 #endif
 #if SYNC_INCLUDE_SETUP_AW_Reg
-    uint8_t Cur_Addr_Length; // µ±Ç°µØÖ·³¤¶È
+    uint8_t Cur_Addr_Length; // å½“å‰åœ°å€é•¿åº¦
 #endif
 #if SYNC_INCLUDE_SETUP_RETR_Reg
-    uint8_t Cur_ARC;  // µ±Ç°×Ô¶¯ÖØ´«´ÎÊı
-    uint16_t Cur_ARD; // µ±Ç°×Ô¶¯ÖØ´«ÑÓÊ±
+    uint8_t Cur_ARC;  // å½“å‰è‡ªåŠ¨é‡ä¼ æ¬¡æ•°
+    uint16_t Cur_ARD; // å½“å‰è‡ªåŠ¨é‡ä¼ å»¶æ—¶
 #endif
 #if SYNC_INCLUDE_RF_CH_Reg
-    uint16_t Cur_Frequency; // µ±Ç°2.4GÆµµÀ
+    uint16_t Cur_Frequency; // å½“å‰2.4Gé¢‘é“
 #endif
 #if SYNC_INCLUDE_RF_SETUP_Reg
-    uint8_t Cur_Air_Data_Rate; // µ±Ç°¿ÕÖĞ´«ÊäËÙÂÊ
-    uint8_t Cur_PA_Control;    // µ±Ç°ÉäÆµ¹¦ÂÊ
+    uint8_t Cur_Air_Data_Rate; // å½“å‰ç©ºä¸­ä¼ è¾“é€Ÿç‡
+    uint8_t Cur_PA_Control;    // å½“å‰å°„é¢‘åŠŸç‡
 #endif
 #if SYNC_INCLUDE_DYNPD_Reg
-    uint8_t EN_Pipe_DPL; // Í¨µÀ¶¯Ì¬ÔØºÉÊ¹ÄÜ     ÄÄÒ»Î»Îª 1 ´ú±íÆôÓÃ
+    uint8_t EN_Pipe_DPL; // é€šé“åŠ¨æ€è½½è·ä½¿èƒ½     å“ªä¸€ä½ä¸º 1 ä»£è¡¨å¯ç”¨
 #endif
 #if SYNC_INCLUDE_FEATURE_Reg
-    uint8_t EN_ACK_PAY_FLAG; // ACK¸½´øÔØºÉÊ¹ÄÜ     ¡¾0 ½ûÓÃ¡¿¡¾1 ÆôÓÃ¡¿
-    uint8_t EN_DYN_ACK_FLAG; // ÎŞACKÔØºÉÊ¹ÄÜ       ¡¾0 ½ûÓÃ¡¿¡¾1 ÆôÓÃ¡¿
-    uint8_t EN_DPL_FLAG;     // ¶¯Ì¬ÔØºÉÊ¹ÄÜ        ¡¾0 ½ûÓÃ¡¿¡¾1 ÆôÓÃ¡¿
+    uint8_t EN_ACK_PAY_FLAG; // ACKé™„å¸¦è½½è·ä½¿èƒ½     ã€0 ç¦ç”¨ã€‘ã€1 å¯ç”¨ã€‘
+    uint8_t EN_DYN_ACK_FLAG; // æ— ACKè½½è·ä½¿èƒ½       ã€0 ç¦ç”¨ã€‘ã€1 å¯ç”¨ã€‘
+    uint8_t EN_DPL_FLAG;     // åŠ¨æ€è½½è·ä½¿èƒ½        ã€0 ç¦ç”¨ã€‘ã€1 å¯ç”¨ã€‘
 #endif
 } NRF24L01_Status_t;
 #endif
 
-/*Ğ¾Æ¬Çı¶¯½á¹¹Ìå*/
-/*Èç¹û¹ÒÔØÁË¶à¸öĞ¾Æ¬£¬NRF24L01_Driver_tÕâ¸ö½á¹¹ÌåÊµ¼ÊÉÏ¾ö¶¨ÁËÊ¹ÓÃÄÄÒ»¸öNRF24L01Ğ¾Æ¬*/
+/*èŠ¯ç‰‡é©±åŠ¨ç»“æ„ä½“*/
+/*å¦‚æœæŒ‚è½½äº†å¤šä¸ªèŠ¯ç‰‡ï¼ŒNRF24L01_Driver_tè¿™ä¸ªç»“æ„ä½“å®é™…ä¸Šå†³å®šäº†ä½¿ç”¨å“ªä¸€ä¸ªNRF24L01èŠ¯ç‰‡*/
 typedef struct NRF24L01_Driver_t NRF24L01_Driver_t;
-struct NRF24L01_Driver_t {
-    // Ó²¼ş³éÏó²ã
-    void (*NRF24L01_W_CE)(GPIO_Status);     // Ğ´CE
-    void (*NRF24L01_W_CS)(GPIO_Status);     // Ğ´CS
-    uint8_t (*SPI_SwapByte_MODE0)(uint8_t); // SPI½»»»µ¥×Ö½Ú£¬´Ëº¯ÊıÄÚÎŞĞè´¦Àí CS ĞÅºÅ
-    void (*Delay_us)(uint32_t);             // Î¢ÃëÑÓ³Ù
+struct NRF24L01_Driver_t
+{
+    // ç¡¬ä»¶æŠ½è±¡å±‚
+    void (*NRF24L01_W_CE)(GPIO_Status);     // å†™CE
+    void (*NRF24L01_W_CS)(GPIO_Status);     // å†™CS
+    uint8_t (*SPI_SwapByte_MODE0)(uint8_t); // SPIäº¤æ¢å•å­—èŠ‚ï¼Œæ­¤å‡½æ•°å†…æ— éœ€å¤„ç† CS ä¿¡å·
+    void (*Delay_us)(uint32_t);             // å¾®ç§’å»¶è¿Ÿ
 #if Status_SYNC
-    // Ğ¾Æ¬×´Ì¬¼à¿Ø
-    NRF24L01_Status_t NRF_Status; // Ğ¾Æ¬×´Ì¬½á¹¹Ìå
+    // èŠ¯ç‰‡çŠ¶æ€ç›‘æ§
+    NRF24L01_Status_t NRF_Status; // èŠ¯ç‰‡çŠ¶æ€ç»“æ„ä½“
 #endif
-    // ÖĞ¶Ï»Øµ÷º¯Êı
-    void (*MAX_RT_CallBack)(NRF24L01_Driver_t *); // ×î´óÖØ·¢ÖĞ¶Ï»Øµ÷º¯Êı
-    void (*TX_DS_CallBack)(NRF24L01_Driver_t *);  // ·¢ËÍÖĞ¶Ï»Øµ÷º¯Êı
-    void (*RX_DR_CallBack)(NRF24L01_Driver_t *);  // ½ÓÊÕÖĞ¶Ï»Øµ÷º¯Êı
+    // ä¸­æ–­å›è°ƒå‡½æ•°
+    void (*MAX_RT_CallBack)(NRF24L01_Driver_t *); // æœ€å¤§é‡å‘ä¸­æ–­å›è°ƒå‡½æ•°
+    void (*TX_DS_CallBack)(NRF24L01_Driver_t *);  // å‘é€ä¸­æ–­å›è°ƒå‡½æ•°
+    void (*RX_DR_CallBack)(NRF24L01_Driver_t *);  // æ¥æ”¶ä¸­æ–­å›è°ƒå‡½æ•°
 #if Debug_Enable
-    // ÅäÖÃ´íÎóÏà¹Ø
-    uint8_t Config_Err_FLAG;                          // ÅäÖÃ´íÎó±êÖ¾Î»
-    void (*My_Printf)(const char *format, ...);       // ´®¿Ú´òÓ¡´íÎóĞÅÏ¢
-    void (*Config_Err_CallBack)(NRF24L01_Driver_t *); // ÅäÖÃ´íÎó»Øµ÷º¯Êı£¬ÔÚÊµÏÖ´Ëº¯ÊıÊ±×¢ÒâÇå³ı±êÖ¾Î»
+    // é…ç½®é”™è¯¯ç›¸å…³
+    uint8_t Config_Err_FLAG;                          // é…ç½®é”™è¯¯æ ‡å¿—ä½
+    void (*My_Printf)(const char *format, ...);       // ä¸²å£æ‰“å°é”™è¯¯ä¿¡æ¯
+    void (*Config_Err_CallBack)(NRF24L01_Driver_t *); // é…ç½®é”™è¯¯å›è°ƒå‡½æ•°ï¼Œåœ¨å®ç°æ­¤å‡½æ•°æ—¶æ³¨æ„æ¸…é™¤æ ‡å¿—ä½
 #endif
 };
 
-/*---------------------------------------N R F 2 4 L 0 1 ÎŞ Ïß Ä£ ¿é º¯ Êı --------------------------------------*/
-/*--------- ½á ¹¹ Ìå Ïà ¹Ø ---------*/
+/*---------------------------------------N R F 2 4 L 0 1 æ—  çº¿ æ¨¡ å— å‡½ æ•° --------------------------------------*/
+/*--------- ç»“ æ„ ä½“ ç›¸ å…³ ---------*/
 #if Status_SYNC
-void NRF24L01_SyncStruct_All(NRF24L01_Driver_t *drv);                                    // Ğ¾Æ¬×´Ì¬½á¹¹ÌåÍ¬²½¡¾È«²¿¡¿
-void NRF24L01_SyncStruct_Single(NRF24L01_Driver_t *drv, uint8_t Reg, uint8_t Reg_Value); // Ğ¾Æ¬×´Ì¬½á¹¹ÌåÍ¬²½¡¾µ¥¸ö¡¿
-void NRF24L01_SyncCheck(NRF24L01_Driver_t *drv, uint8_t Reg_Addr);                       // ¼ì²éÅäÖÃÍ¬²½
+void NRF24L01_SyncStruct_All(NRF24L01_Driver_t *drv);                                    // èŠ¯ç‰‡çŠ¶æ€ç»“æ„ä½“åŒæ­¥ã€å…¨éƒ¨ã€‘
+void NRF24L01_SyncStruct_Single(NRF24L01_Driver_t *drv, uint8_t Reg, uint8_t Reg_Value); // èŠ¯ç‰‡çŠ¶æ€ç»“æ„ä½“åŒæ­¥ã€å•ä¸ªã€‘
+void NRF24L01_SyncCheck(NRF24L01_Driver_t *drv, uint8_t Reg_Addr);                       // æ£€æŸ¥é…ç½®åŒæ­¥
 #endif
-/*------- ÖĞ ¶Ï ·ş Îñ º¯ Êı --------*/
-void NRF24L01_IRQHandler(NRF24L01_Driver_t *drv); // ÖĞ¶Ï·şÎñº¯Êı£¬ÔÚÄÚ²¿µ÷ÓÃ½á¹¹ÌåÄÚµÄ»Øµ÷º¯Êı
-/*--------- ¶Á Ğ´ ¼Ä ´æ Æ÷ ---------*/
-uint8_t NRF24L01_R_Reg(NRF24L01_Driver_t *drv, uint8_t Reg_adress);                                // ¶Á¼Ä´æÆ÷
-uint8_t *NRF24L01_R_Regs(NRF24L01_Driver_t *drv, uint8_t Reg_adress, uint8_t *Rece, uint8_t size); // ¶Á¼Ä´æÆ÷¶à×Ö½Ú
-void NRF24L01_W_Reg(NRF24L01_Driver_t *drv, uint8_t Reg_adress, uint8_t Data);                     // Ğ´¼Ä´æÆ÷
-void NRF24L01_W_Regs(NRF24L01_Driver_t *drv, uint8_t Reg_adress, uint8_t *Data, uint8_t size);     // Ğ´¼Ä´æÆ÷¶à×Ö½Ú
-/*---------- ¹¦ ÄÜ º¯ Êı ----------*/
-void NRF24L01_EnterPowerDown(NRF24L01_Driver_t *drv);                                                       // ½øÈëµôµçÄ£Ê½
-void NRF24L01_EnterTx(NRF24L01_Driver_t *drv);                                                              // ½øÈë·¢ËÍÄ£Ê½
-void NRF24L01_EnterRx(NRF24L01_Driver_t *drv);                                                              // ½øÈë½ÓÊÕÄ£Ê½
-void NRF24L01_EnterStandby_1(NRF24L01_Driver_t *drv);                                                       // ½øÈë´ı»úÄ£Ê½1
-void NRF24L01_ClearFIFOTx(NRF24L01_Driver_t *drv);                                                          // Çå¿ÕFIFOTx
-void NRF24L01_ClearFIFORx(NRF24L01_Driver_t *drv);                                                          // Çå¿ÕFIFORx
-void NRF24L01_R_RxFIFO(NRF24L01_Driver_t *drv, NRF24L01_Pack_t *Rece);                                      // ¶ÁRx_FIFO¡¾¾²Ì¬ÔØºÉ¡¿¡¾¶¯Ì¬ÔØºÉ¡¿
-void NRF24L01_W_TxFIFO(NRF24L01_Driver_t *drv, W_TX_Command W_TX, uint8_t *Send, uint8_t size, uint8_t Pipe_X); // Ğ´Tx_FIFO
-void NRF24L01_SendData(NRF24L01_Driver_t *drv);                                                             // ·¢ËÍÊı¾İ
-NRF24L01_FLAG_Status NRF24L01_GetITFLAG(NRF24L01_Driver_t *drv, Reg_STATUS IT_FLAG);                        // »ñÈ¡ÖĞ¶Ï±êÖ¾Î»
-void NRF24L01_ClearITFLAG(NRF24L01_Driver_t *drv, Reg_STATUS IT_FLAG);                                      // Çå³ıÖĞ¶Ï±êÖ¾Î»
-uint8_t NRF24L01_R_RxNum(NRF24L01_Driver_t *drv, Reg_RX_PW RX_PW_Px);                                       // ¶ÁÈ¡½ÓÊÕÍ¨µÀ½ÓÊÕ×Ö½ÚÊı¡¾¾²Ì¬ÔØºÉ¡¿
-uint8_t NRF24L01_GetDataPipe(NRF24L01_Driver_t *drv);                                                       // »ñÈ¡Êı¾İÀ´×ÔÄÄ¸ö¹ÜµÀ
-/*---------- Åä ÖÃ º¯ Êı ----------*/
-void NRF24L01_EN_AutoACK(NRF24L01_Driver_t *drv, Reg_EN_AA EN_AA, NRF24L01_Status new_status);                // Ê¹ÄÜ×Ô¶¯Ó¦´ğ
-void NRF24L01_EN_RxAddr(NRF24L01_Driver_t *drv, Reg_EN_RXADDR ERX, NRF24L01_Status new_status);               // Ê¹ÄÜ½ÓÊÕÍ¨µÀ
-void NRF24L01_Set_Addr_Width(NRF24L01_Driver_t *drv, Reg_SETUP_AW Address_Width);                             // ÉèÖÃµØÖ·³¤¶È
-void NRF24L01_Set_RETR(NRF24L01_Driver_t *drv, Reg_SETUP_RETR_ARD ARD, Reg_SETUP_RETR_ARC ARC);               // ÉèÖÃ×Ô¶¯ÖØ´«ÑÓÊ±£¬×Ô¶¯ÖØ´«´ÎÊı
-void NRF24L01_SetAir_Data_Rate(NRF24L01_Driver_t *drv, Reg_RF_SETUP RF_DR);                                   // ÉèÖÃ¿ÕÖĞÊı¾İËÙÂÊ
-void NRF24L01_PA_Control(NRF24L01_Driver_t *drv, Reg_RF_SETUP RF_PWR);                                        // ÉèÖÃÉäÆµÊä³ö¹¦ÂÊ
-void NRF24L01_SetFrequencyMHz(NRF24L01_Driver_t *drv, uint16_t freqMHz);                                      // ÉèÖÃ2.4gÍ¨ĞÅÆµ¶Î
-void NRF24L01_EN_DPL(NRF24L01_Driver_t *drv, Reg_DYNPD EN_DPL, NRF24L01_Status new_status);                   // Ê¹ÄÜÍ¨µÀ¶¯Ì¬ÔØºÉ
-void NRF24L01_EN_FEATURE(NRF24L01_Driver_t *drv, Reg_FEATURE EN_FEATURE, NRF24L01_Status new_status);         // Ê¹ÄÜÌØÊâ¹¦ÄÜ
-void NRF24L01_Set_CRCByte(NRF24L01_Driver_t *drv, Reg_CONFIG CRC_x);                                          // ÉèÖÃ¼¸×Ö½ÚCRCĞ£ÑéÂë
-void NRF24L01_EN_Interrupt(NRF24L01_Driver_t *drv, Reg_CONFIG MASK_Int, NRF24L01_Status new_status);          // Ê¹ÄÜÖĞ¶Ï
-void NRF24L01_Set_RxAddr(NRF24L01_Driver_t *drv, Reg_RX_ADDR RX_ADDR_Px, uint8_t *Addr, uint8_t Addr_length); // ÉèÖÃ½ÓÊÕÍ¨µÀµØÖ·
-void NRF24L01_Set_TxAddr(NRF24L01_Driver_t *drv, uint8_t *Addr, uint8_t Addr_length);                         // ÉèÖÃÄ¿±êµØÖ·
-void NRF24L01_Set_RxNum(NRF24L01_Driver_t *drv, Reg_RX_PW RX_PW_Px, uint8_t count);                           // ÉèÖÃ½ÓÊÕÍ¨µÀ½ÓÊÕ×Ö½ÚÊı
+/*------- ä¸­ æ–­ æœ åŠ¡ å‡½ æ•° --------*/
+void NRF24L01_IRQHandler(NRF24L01_Driver_t *drv); // ä¸­æ–­æœåŠ¡å‡½æ•°ï¼Œåœ¨å†…éƒ¨è°ƒç”¨ç»“æ„ä½“å†…çš„å›è°ƒå‡½æ•°
+/*--------- è¯» å†™ å¯„ å­˜ å™¨ ---------*/
+uint8_t NRF24L01_R_Reg(NRF24L01_Driver_t *drv, uint8_t Reg_adress);                                // è¯»å¯„å­˜å™¨
+uint8_t *NRF24L01_R_Regs(NRF24L01_Driver_t *drv, uint8_t Reg_adress, uint8_t *Rece, uint8_t size); // è¯»å¯„å­˜å™¨å¤šå­—èŠ‚
+void NRF24L01_W_Reg(NRF24L01_Driver_t *drv, uint8_t Reg_adress, uint8_t Data);                     // å†™å¯„å­˜å™¨
+void NRF24L01_W_Regs(NRF24L01_Driver_t *drv, uint8_t Reg_adress, uint8_t *Data, uint8_t size);     // å†™å¯„å­˜å™¨å¤šå­—èŠ‚
+/*---------- åŠŸ èƒ½ å‡½ æ•° ----------*/
+void NRF24L01_EnterPowerDown(NRF24L01_Driver_t *drv);                                                           // è¿›å…¥æ‰ç”µæ¨¡å¼
+void NRF24L01_EnterTx(NRF24L01_Driver_t *drv);                                                                  // è¿›å…¥å‘é€æ¨¡å¼
+void NRF24L01_EnterRx(NRF24L01_Driver_t *drv);                                                                  // è¿›å…¥æ¥æ”¶æ¨¡å¼
+void NRF24L01_EnterStandby_1(NRF24L01_Driver_t *drv);                                                           // è¿›å…¥å¾…æœºæ¨¡å¼1
+void NRF24L01_ClearFIFOTx(NRF24L01_Driver_t *drv);                                                              // æ¸…ç©ºFIFOTx
+void NRF24L01_ClearFIFORx(NRF24L01_Driver_t *drv);                                                              // æ¸…ç©ºFIFORx
+void NRF24L01_R_RxFIFO(NRF24L01_Driver_t *drv, NRF24L01_Pack_t *Rece);                                          // è¯»Rx_FIFOã€é™æ€è½½è·ã€‘ã€åŠ¨æ€è½½è·ã€‘
+void NRF24L01_R_RxFIFO_LatestData(NRF24L01_Driver_t *drv, NRF24L01_Pack_t *Rece);                               // è·å–æœ€æ–°Rx_FIFOçš„å€¼ã€é™æ€è½½è·ã€‘ã€åŠ¨æ€è½½è·ã€‘
+void NRF24L01_W_TxFIFO(NRF24L01_Driver_t *drv, W_TX_Command W_TX, uint8_t *Send, uint8_t size, uint8_t Pipe_X); // å†™Tx_FIFO
+void NRF24L01_SendData(NRF24L01_Driver_t *drv);                                                                 // å‘é€æ•°æ®
+NRF24L01_FLAG_Status NRF24L01_GetITFLAG(NRF24L01_Driver_t *drv, Reg_STATUS IT_FLAG);                            // è·å–ä¸­æ–­æ ‡å¿—ä½
+void NRF24L01_ClearITFLAG(NRF24L01_Driver_t *drv, Reg_STATUS IT_FLAG);                                          // æ¸…é™¤ä¸­æ–­æ ‡å¿—ä½
+uint8_t NRF24L01_R_RxNum(NRF24L01_Driver_t *drv, Reg_RX_PW RX_PW_Px);                                           // è¯»å–æ¥æ”¶é€šé“æ¥æ”¶å­—èŠ‚æ•°ã€é™æ€è½½è·ã€‘
+uint8_t NRF24L01_GetDataPipe(NRF24L01_Driver_t *drv);                                                           // è·å–æ•°æ®æ¥è‡ªå“ªä¸ªç®¡é“
+bool NRF24L01_Check_FIFO_Status(NRF24L01_Driver_t *drv, Reg_FIFO_STATUS FIFO_MASK);                             // æ£€æŸ¥FIFOçŠ¶æ€
+/*---------- é… ç½® å‡½ æ•° ----------*/
+void NRF24L01_EN_AutoACK(NRF24L01_Driver_t *drv, Reg_EN_AA EN_AA, NRF24L01_Status new_status);                // ä½¿èƒ½è‡ªåŠ¨åº”ç­”
+void NRF24L01_EN_RxAddr(NRF24L01_Driver_t *drv, Reg_EN_RXADDR ERX, NRF24L01_Status new_status);               // ä½¿èƒ½æ¥æ”¶é€šé“
+void NRF24L01_Set_Addr_Width(NRF24L01_Driver_t *drv, Reg_SETUP_AW Address_Width);                             // è®¾ç½®åœ°å€é•¿åº¦
+void NRF24L01_Set_RETR(NRF24L01_Driver_t *drv, Reg_SETUP_RETR_ARD ARD, Reg_SETUP_RETR_ARC ARC);               // è®¾ç½®è‡ªåŠ¨é‡ä¼ å»¶æ—¶ï¼Œè‡ªåŠ¨é‡ä¼ æ¬¡æ•°
+void NRF24L01_SetAir_Data_Rate(NRF24L01_Driver_t *drv, Reg_RF_SETUP RF_DR);                                   // è®¾ç½®ç©ºä¸­æ•°æ®é€Ÿç‡
+void NRF24L01_PA_Control(NRF24L01_Driver_t *drv, Reg_RF_SETUP RF_PWR);                                        // è®¾ç½®å°„é¢‘è¾“å‡ºåŠŸç‡
+void NRF24L01_SetFrequencyMHz(NRF24L01_Driver_t *drv, uint16_t freqMHz);                                      // è®¾ç½®2.4gé€šä¿¡é¢‘æ®µ
+void NRF24L01_EN_DPL(NRF24L01_Driver_t *drv, Reg_DYNPD EN_DPL, NRF24L01_Status new_status);                   // ä½¿èƒ½é€šé“åŠ¨æ€è½½è·
+void NRF24L01_EN_FEATURE(NRF24L01_Driver_t *drv, Reg_FEATURE EN_FEATURE, NRF24L01_Status new_status);         // ä½¿èƒ½ç‰¹æ®ŠåŠŸèƒ½
+void NRF24L01_Set_CRCByte(NRF24L01_Driver_t *drv, Reg_CONFIG CRC_x);                                          // è®¾ç½®å‡ å­—èŠ‚CRCæ ¡éªŒç 
+void NRF24L01_EN_Interrupt(NRF24L01_Driver_t *drv, Reg_CONFIG MASK_Int, NRF24L01_Status new_status);          // ä½¿èƒ½ä¸­æ–­
+void NRF24L01_Set_RxAddr(NRF24L01_Driver_t *drv, Reg_RX_ADDR RX_ADDR_Px, uint8_t *Addr, uint8_t Addr_length); // è®¾ç½®æ¥æ”¶é€šé“åœ°å€
+void NRF24L01_Set_TxAddr(NRF24L01_Driver_t *drv, uint8_t *Addr, uint8_t Addr_length);                         // è®¾ç½®ç›®æ ‡åœ°å€
+void NRF24L01_Set_RxNum(NRF24L01_Driver_t *drv, Reg_RX_PW RX_PW_Px, uint8_t count);                           // è®¾ç½®æ¥æ”¶é€šé“æ¥æ”¶å­—èŠ‚æ•°
 
 #endif
